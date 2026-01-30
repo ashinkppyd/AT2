@@ -2,61 +2,51 @@ import React, { useEffect, useState } from 'react'
 import "./Profile.css"
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
-function Profile() {
-  let data=localStorage.getItem("user")
-  let conv=JSON.parse(data)
-  let userId=conv.id
-  let [orders,setOrders]=useState(null)
-  let nav=useNavigate()
-  useEffect(()=>{
-     axios.get(`http://localhost:3000/user/${userId}`).then((res)=>{
-      setOrders(res.data.order)
-     })
-  },[])
-  if(orders==null) return <p>no orders found</p>
-  console.log(orders)
+import { toast } from 'react-toastify'
 
-  function handleLogout(){
+function Profile() {
+  const [user, setUser] = useState(null)
+  const [orders, setOrders] = useState([])
+  const nav = useNavigate()
+
+  useEffect(() => {
+    axios.get(
+      'http://127.0.0.1:8000/api/account/profile/',
+      { withCredentials: true }
+    )
+    .then(res => {
+      setUser(res.data)
+      setOrders(res.data.orders || [])
+    })
+    .catch(() => {
       nav('/login')
-      localStorage.setItem("isLoggedIn","false")
-      localStorage.clear()
-    }
+    })
+  }, [])
+
+  function handleLogout() {
+    axios.post(
+      'http://127.0.0.1:8000/api/account/logout/',
+      {},
+      { withCredentials: true }
+    ).then(() => {
+      toast.success("Logged out")
+      nav('/login')
+    })
+  }
+
+  if (!user) return <p>Loading...</p>
+
   return (
     <div>
-    <div className='user'>
-      <div>
-      <h2>personal details</h2>
-        <p>Name:{conv.userName} </p>
-        <p>email:{conv.email}</p>
-        <p>cartitems and quand</p> 
-        <button onClick={handleLogout}>LOGOUT</button></div>  
-        <img src='/src/assets/profile.jpg' className='pfp'/>     
-    </div>
-  
-    
-
-     <div className='previous'>
-        <h1>previous orders</h1>
-      <div className='orders-container'>
-         {orders && orders.map((order,idx)=><><p key={idx}></p>
-         <div>
-          {order.items.map((p)=><div>
-            <p>product Id:{p.id}</p>
-            <img src={p.image} alt="" />
-            <p>{p.name}</p>
-            <p>{p.description}</p>
-            <p>Date:{order.date}</p>
-          <p>Total:{order.total}</p>
-          <button onClick={()=>{
-            nav(`/details/${p.id}`)
-          }}>Buy Again</button>
-          </div>)}
-         </div>
-         </>
-        )
-          }
+      <div className='user'>
+        <div>
+          <h2>Personal details</h2>
+          <p>Name: {user.username}</p>
+          <p>Email: {user.email}</p>
+          <button onClick={handleLogout}>LOGOUT</button>
+        </div>
+        <img src='/src/assets/profile.jpg' className='pfp'/>
       </div>
-     </div>
     </div>
   )
 }

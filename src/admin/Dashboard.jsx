@@ -9,7 +9,7 @@ function Dashboard() {
   const [products,setproducs]=useState([])
   useEffect(() => {
     axios.get('http://localhost:3000/allOrders')
-      .then((res) => setOrders(res.data))
+      .then((res) => setOrders(res.data.reverse()))
       .catch((err) => console.error("Error fetching orders:", err))
       axios.get(`http://localhost:3000/user`)
       .then((res)=>{setUser(res.data)})

@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import Footer from "../components/Footer";
 import './shop.css'
-
 function Shop() {
   const [product, setProduct] = useState([]);
   const [brand, setbrand] = useState("all");

@@ -68,6 +68,52 @@
         "phoneNumber": "09521522",
         "date": "24/9/2025, 12:32:33 pm"
       }
+    },
+    {
+      "id": "dadd",
+      "order": {
+        "userId": "fa25",
+        "names": "ashin",
+        "items": [
+          {
+            "id": "108",
+            "name": "Rolex",
+            "price": 27000,
+            "category": "AUTOMATIC",
+            "image": "http://localhost:5173/public/watch-8.jpeg",
+            "description": "Symbols of the long shared history between Rolex and deep-sea explorers, the Oyster Perpetual Rolex Deepsea and Oyster Perpetual Deepsea Challenge models are ultra-resistant professional divers’ watches. They are waterproof to a depth of 3,900 metres (12,800 feet) for the Rolex Deepsea, launched in 2008, and 11,000 metres (36,090 feet) for the Deepsea Challenge, presented in 2022.",
+            "quantity": 1
+          }
+        ],
+        "total": 27000,
+        "payment": "cod",
+        "address": "wertt",
+        "phoneNumber": "12345",
+        "date": "26/9/2025, 5:23:39 pm"
+      }
+    },
+    {
+      "id": "b71b",
+      "order": {
+        "userId": "fa25",
+        "names": "asf",
+        "items": [
+          {
+            "id": "104",
+            "name": "Rolex",
+            "price": 23000,
+            "category": "Automatic",
+            "image": "http://localhost:5173/public/watch-4.jpeg",
+            "description": "The oyster perpetual submariner date in 18 ct yellow gold with a cerachrom bezel insert in black ceramic and a black dial with large luminescent hour markers.Symbols of the long shared history between Rolex and deep-sea explorers, the Oyster Perpetual Rolex Deepsea and Oyster Perpetual Deepsea Challenge models are ultra-resistant professional divers’ watches. They are waterproof to a depth of 3,900 metres (12,800 feet) for the Rolex Deepsea, launched in 2008, and 11,000 metres (36,090 feet) for the Deepsea Challenge, presented in 2022.",
+            "quantity": 1
+          }
+        ],
+        "total": 23000,
+        "payment": "upi",
+        "address": "chanthapetta,\npalakkad,\npin:678557",
+        "phoneNumber": "65465152",
+        "date": "30/9/2025, 11:43:36 am"
+      }
     }
   ],
   "user": [
@@ -76,7 +122,7 @@
       "userName": "abc",
       "email": "abc@gmail.com",
       "password": "1234",
-      "status": "active",
+      "status": "block",
       "role": "user",
       "cart": [],
       "order": [
@@ -109,7 +155,9 @@
       "password": "1234",
       "status": "active",
       "role": "admin",
-      "cart": [],
+      "cart": [
+        "104"
+      ],
       "order": [
         {
           "userId": "834f",
@@ -139,7 +187,13 @@
       "email": "aliyan@gmail.com",
       "password": "1234",
       "role": "user",
-      "cart": [],
+      "cart": [
+        "104",
+        "104",
+        "104",
+        "104",
+        "102"
+      ],
       "order": [
         {
           "userId": "fa25",
@@ -160,16 +214,66 @@
           "address": "chanthapetta,\npalakkad,\npin:678557",
           "phoneNumber": "09521522",
           "date": "25/9/2025, 11:59:09 am"
+        },
+        {
+          "userId": "fa25",
+          "names": "ashin",
+          "items": [
+            {
+              "id": "108",
+              "name": "Rolex",
+              "price": 27000,
+              "category": "AUTOMATIC",
+              "image": "http://localhost:5173/public/watch-8.jpeg",
+              "description": "Symbols of the long shared history between Rolex and deep-sea explorers, the Oyster Perpetual Rolex Deepsea and Oyster Perpetual Deepsea Challenge models are ultra-resistant professional divers’ watches. They are waterproof to a depth of 3,900 metres (12,800 feet) for the Rolex Deepsea, launched in 2008, and 11,000 metres (36,090 feet) for the Deepsea Challenge, presented in 2022.",
+              "quantity": 1
+            }
+          ],
+          "total": 27000,
+          "payment": "cod",
+          "address": "wertt",
+          "phoneNumber": "12345",
+          "date": "26/9/2025, 5:23:39 pm"
+        },
+        {
+          "userId": "fa25",
+          "names": "asf",
+          "items": [
+            {
+              "id": "104",
+              "name": "Rolex",
+              "price": 23000,
+              "category": "Automatic",
+              "image": "http://localhost:5173/public/watch-4.jpeg",
+              "description": "The oyster perpetual submariner date in 18 ct yellow gold with a cerachrom bezel insert in black ceramic and a black dial with large luminescent hour markers.Symbols of the long shared history between Rolex and deep-sea explorers, the Oyster Perpetual Rolex Deepsea and Oyster Perpetual Deepsea Challenge models are ultra-resistant professional divers’ watches. They are waterproof to a depth of 3,900 metres (12,800 feet) for the Rolex Deepsea, launched in 2008, and 11,000 metres (36,090 feet) for the Deepsea Challenge, presented in 2022.",
+              "quantity": 1
+            }
+          ],
+          "total": 23000,
+          "payment": "upi",
+          "address": "chanthapetta,\npalakkad,\npin:678557",
+          "phoneNumber": "65465152",
+          "date": "30/9/2025, 11:43:36 am"
         }
       ],
-      "status": "active"
+      "status": "block"
+    },
+    {
+      "id": "4bd5",
+      "userName": "giggle",
+      "email": "giggle123@gmail.com",
+      "password": "1234",
+      "cart": [
+        "104"
+      ],
+      "order": []
     }
   ],
   "AllProducts": [
     {
       "id": "102",
       "name": "Rolex",
-      "price": 14000,
+      "price": "13000",
       "category": "AUTOMATIC",
       "image": "http://localhost:5173/public/watch-2.jpeg",
       "description": "Since its inception in 1953, the Rolex Submariner has stood as a paragon of luxury diving watches. With its innovative design, it set the standard for waterproof watches, initially boasting a depth rating of 100 meters. Over the decades, it became an icon, with distinctive features like the unidirectional rotatable bezel, enhancing its appeal to both professional divers and watch enthusiasts. To uncover the chronicle of timekeeping excellence, we welcome you to explore our meticulously assembled selection of new, pre-owned, and certified authentic Rolex Submariner watches."

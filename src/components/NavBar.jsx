@@ -1,37 +1,69 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import './Navbar.css'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
+import axios from 'axios'
 
 function NavBar() {
-    let nav=useNavigate()
+  const nav = useNavigate()
+  const location = useLocation()
+  const [isAuth, setIsAuth] = useState(false)
 
-    function handleLogin(){
-      nav('/login')
-    }
-    function handleLogout(){
-      nav('/login')
-      localStorage.setItem("isLoggedIn","false")
-      localStorage.clear()
+  useEffect(() => {
+    axios.get(
+      'http://127.0.0.1:8000/api/account/profile/',
+      { withCredentials: true }
+    )
+    .then((res) => {
+      console.log("hello");
+      setIsAuth(true)
+        console.log(res.data)
 
-    }
+    })
+    .catch((error) => {
+      console.log(error.message);
+      setIsAuth(false)
+    })
+  }, [location.pathname]) // 🔥 re-check on route change
+
+  function handleLogout() {
+    axios.post(
+      'http://127.0.0.1:8000/api/account/logout/',
+      {},
+      { withCredentials: true }
+    ).then(() => {
+      setIsAuth(false)
+      nav('/login')
+    })
+  }
+
   return (
- <>
- <div className='con'>
-  <ul className='left'>
-    <li className='listItem logo' >AT2</li>
-  </ul>
-  <ul className='right'>
-    <li className='listItem' onClick={()=>nav('/')}>Home</li>
-    <li className='listItem' onClick={()=>nav('/shop')}>shop</li>
-    <li className='listItem' onClick={()=>nav('/blog')}>blog</li>
-    <li className='listItem' onClick={()=>nav('/cart')}>Cart</li>
-    <li>{(localStorage.getItem("isLoggedIn")=== "true")?
-      <div className='listItem' onClick={()=>nav('/profile')}>Profile</div>: 
-      <button onClick={handleLogin}>Login</button> }</li>
-  </ul>
+    <div className='con'>
+      <ul className='left'>
+        <li className='listItem logo'>AT2</li>
+      </ul>
 
- </div>
- </>
+      <ul className='right'>
+        <li className='listItem' onClick={() => nav('/')}>Home</li>
+        <li className='listItem' onClick={() => nav('/shop')}>Shop</li>
+        <li className='listItem' onClick={() => nav('/blog')}>Blog</li>
+        <li className='listItem' onClick={() => nav('/cart')}>Cart</li>
+
+        <li>
+          {isAuth ? (
+            <>
+              <span className='listItem' onClick={() => nav('/profile')}>
+                Profile
+              </span>
+              <span className='listItem' onClick={handleLogout}>
+                Logout
+              </span>
+            </>
+          ) : (
+            <button onClick={() => nav('/login')}>Login</button>
+          )}
+        </li>
+      </ul>
+    </div>
   )
 }
 

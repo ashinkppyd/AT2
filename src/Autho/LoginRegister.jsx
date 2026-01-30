@@ -5,7 +5,6 @@ import './LoginRegister.css';
 import { FaUser } from "@react-icons/all-files/fa/FaUser";
 import { FaLock } from "@react-icons/all-files/fa/FaLock";
 import { FaEnvelope } from "@react-icons/all-files/fa/FaEnvelope";
-v
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
@@ -39,10 +38,14 @@ function handleRegister(e){
   }
   setError(error)
   if(Object.keys(error).length==0){
-    axios.post('http://localhost:3000/user',{...user,cart:[],order:[]})
+    axios.post('http://127.0.0.1:8000/api/account/register/', {
+  username: user.userName,
+  email: user.email,
+  password: user.password
+})
     setUser({userName:"",email:"",password:"",cart:[],orders:[],role:"user"})
     setState('')
-
+ 
   }
     return
 
@@ -50,35 +53,46 @@ function handleRegister(e){
 let  [userName,setUserName]=useState('')
 let  [password,setPassword]=useState('')
 let nav=useNavigate()
-async function handelLogin(e){
-    e.preventDefault()
-    let res= await axios.get(`http://localhost:3000/user?userName=${userName}&password=${password}`)
-    console.log(userName)
-    console.log(password)
-    if(res.data.length>0){
-        let user=res.data[0]
-        localStorage.setItem("user",JSON.stringify(res.data[0]))
-        localStorage.setItem("isLoggedIn","true" ) 
-        console.log(user)
-        let users=localStorage.getItem("user")
-        let conv=JSON.parse(users)
-        if(conv.role=="user"&& res.data.length>0){
-             toast.success("logged in sucesssfully")
-             setTimeout(()=>{ nav('/')},1000)
-           
-        }
-        if(user.role=="admin"){
-            toast.success("logged in sucesssfully")
-            setTimeout(()=>{nav('/dashboard')},1000)
-        }
-        if(user.status=="block"){
-         toast.warning("yor are blocked")
-        }
-       
-    }else{
-        alert("somthing went wrong")
-    }
+async function handelLogin(e) {
+  e.preventDefault()
+
+  try {
+   const res = await axios.post(
+  'http://127.0.0.1:8000/api/account/login/',
+  {
+    username: userName,
+    password: password
+  },
+  {
+    withCredentials: true
+  }
+)
+
+
+
+
+    // if (res.data.status === "block") {
+    //   toast.warning("You are blocked")
+    //   return
+    // }
+
+    toast.success(res.data.message)
+    console.log(res.data)
+
+  setTimeout(() => {
+  if (res.data.role === "admin") {
+    nav("/dashboard")
+  } else {
+    nav("/")
+  }
+}, 1200)
+
+  } catch (err) {
+    // console.log("Login error:", err.response?.data)
+    toast.error(err.response?.data?.error || "Login fd")
+  }
 }
+
 
   return (
     <div className='body'>
