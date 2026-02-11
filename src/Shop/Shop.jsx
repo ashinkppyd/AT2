@@ -1,53 +1,69 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer, toast } from "react-toastify";
 import Footer from "../components/Footer";
-import './shop.css'
-function Shop() {
-  const [product, setProduct] = useState([]);
-  const [brand, setbrand] = useState("all");
-  const [filtered, setFiletered] = useState([]);
-  const [category, setcategory] = useState("all");
-  const [price, setprice] = useState("all");
-  const [search, setSearch] = useState('');
+import "./shop.css";
+import api from "../api/api";
 
-  let nav = useNavigate();
+function Shop() {
+  const [product, setProduct] = useState([]);     
+  const [filtered, setFiltered] = useState([]);   
+  const [brand, setBrand] = useState("all");
+  const [category, setCategory] = useState("all");
+  const [price, setPrice] = useState("all");
+  const [search, setSearch] = useState("");
+
+ 
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const nav = useNavigate();
+
+  const fetchProducts = async (pageNumber = 1) => {
+    try {
+      const res = await axios.get(
+        `http://localhost:8000/api/products/watches/?page=${pageNumber}`
+      );
+
+      const results = res.data.results || [];
+
+      setProduct(results);
+      setFiltered(results);
+
+      setTotalPages(Math.ceil(res.data.count / 12));
+    } catch (err) {
+      toast.error("Failed to load products");
+      setProduct([]);
+      setFiltered([]);
+    }
+  };
 
   useEffect(() => {
-    axios
-      .get("http://localhost:3000/AllProducts")
-      .then((res) => {
-        setProduct(res.data);
-        setFiletered(res.data);
-      })
-      .catch(() => alert("Something went wrong"));
-  }, []);
+    fetchProducts(page);
+  }, [page]);
+  const addToCart = async (productId) => {
+    try {
+      const res = await api.post(
+        "cart/add/",
+        { product: productId },
+        { withCredentials: true }
+      );
 
-  let user = localStorage.getItem('user');
-  let conv = user ? JSON.parse(user) : null;
-  let userId = conv ? conv.id : null;
-
-  function addToCart(id) {
-    if (!conv || !userId ) {
-      toast.error("Please login to add items!");
-      nav("/login");
-      return;
+      toast.success(res.data.message || "Item added to cart");
+    } catch (err) {
+      if (err.response?.status === 401) {
+        toast.error(err.response.data.message);
+        setTimeout(() => nav("/login"), 1500);
+      } else {
+        toast.error("Failed to add item");
+      }
     }
-
-    let updatedCart = [...(conv.cart || []), id];
-    axios.patch(`http://localhost:3000/user/${userId}`, { cart: updatedCart })
-      .then(() => {
-    
-        toast.success("item added!");
-      });
-
-    conv.cart = updatedCart;
-    localStorage.setItem("user", JSON.stringify(conv));
-  }
+  };
 
   useEffect(() => {
     let result = [...product];
+
     if (brand !== "all") {
       result = result.filter((p) => p.name === brand);
     }
@@ -57,88 +73,121 @@ function Shop() {
     }
 
     if (price !== "all") {
-      if (price === "lowToHigh") {
-        result = [...result].sort((x, y) => x.price - y.price); 
-      } else {
-        result = [...result].sort((x, y) => y.price - x.price);
-      }
-    }
-
-    if (search.trim() !== "") {
-      result = result.filter((items) =>
-        items.name.toLowerCase().includes(search.toLowerCase())
+      result.sort((a, b) =>
+        price === "lowToHigh"
+          ? Number(a.price) - Number(b.price)
+          : Number(b.price) - Number(a.price)
       );
     }
 
-    setFiletered(result);
+    if (search.trim()) {
+      result = result.filter((p) =>
+        p.name.toLowerCase().includes(search.toLowerCase())
+      );
+    }
+
+    setFiltered(result);
   }, [brand, category, price, search, product]);
 
   return (
     <>
-      <div className="contai ">
+      <div className="contai">
+        
         <nav className="nav">
-          <select onChange={(e) => setbrand(e.target.value)}>
+          <select onChange={(e) => setBrand(e.target.value)}>
             <option value="all">All</option>
             <option value="Rolex">Rolex</option>
             <option value="CASIO">CASIO</option>
             <option value="FOSSIL">FOSSIL</option>
             <option value="Noise">Noise</option>
-            <option value="samsung">samsung</option>
+            <option value="Samsung">Samsung</option>
           </select>
 
-          <select onChange={(e) => setcategory(e.target.value)}>
+          <select onChange={(e) => setCategory(e.target.value)}>
             <option value="all">All</option>
             <option value="AUTOMATIC">AUTOMATIC</option>
             <option value="DIGITAL">DIGITAL</option>
             <option value="SMART WATCH">SMART WATCH</option>
           </select>
 
-          <select onChange={(e) => setprice(e.target.value)}>
+          <select onChange={(e) => setPrice(e.target.value)}>
             <option value="all">Choose</option>
             <option value="lowToHigh">Low to High</option>
-            <option value="HighToLow">High to low</option>
+            <option value="HighToLow">High to Low</option>
           </select>
 
-          <div>
-            <input
-              type="text"
-              placeholder="Search..."
-              style={{ borderRadius: "10px" }}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
+          <input
+            type="text"
+            placeholder="Search..."
+            onChange={(e) => setSearch(e.target.value)}
+          />
         </nav>
-        <br></br>
 
-        <div className="row">
-          {filtered.map((p, index) => (
-            <div key={index} className="col-md-3 mb-3">
-              <div className="card h-100 shadow-sm img-hover">
-                <img
-                  src={p.image}
-                  className="card-img-top"
-                  alt={p.name}
-                  style={{ objectFit: "contain", height: "250px" }}
-                  onClick={() => { nav(`/details/${p.id}`) }}
-                />
-                <div className="card-body d-flex flex-column">
-                  <h5 className="card-title">{p.name}</h5>
-                  <p className="card-text text-muted">{p.category}</p>
-                  <h4 className="text-primary mb-3">₹{p.price}</h4>
-                  <button
-                    className="btn btn-dark mt-auto"
-                    onClick={() => { addToCart(p.id) }}
-                  >
-                    Add to Cart
-                  </button>
+        <div className="row mt-3">
+          {filtered.length === 0 ? (
+            <p>No products found</p>
+          ) : (
+            filtered.map((p) => (
+              <div key={p.id} className="col-md-3 mb-3">
+                <div className="card h-100 shadow-sm">
+                  <img
+                    src={p.image}
+                    className="card-img-top"
+                    alt={p.name}
+                    style={{ objectFit: "contain", height: "250px" }}
+                    onClick={() => nav(`/details/${p.id}`)}
+                  />
+
+                  <div className="card-body d-flex flex-column">
+                    <h5>{p.name}</h5>
+                    <p className="text-muted">{p.category}</p>
+                    <h4>₹{p.price}</h4>
+
+                    <button
+                      className="btn btn-dark mt-auto"
+                      onClick={() => addToCart(p.id)}
+                    >
+                      Add to Cart
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
+
+       
+        {totalPages > 1 && (
+          <div className="pagination">
+            <button
+              disabled={page === 1}
+              onClick={() => setPage(page - 1)}
+            >
+              Prev
+            </button>
+
+            {[...Array(totalPages)].map((_, i) => (
+              <button
+                key={i}
+                className={page === i + 1 ? "active" : ""}
+                onClick={() => setPage(i + 1)}
+              >
+                {i + 1}
+              </button>
+            ))}
+
+            <button
+              disabled={page === totalPages}
+              onClick={() => setPage(page + 1)}
+            >
+              Next
+            </button>
+          </div>
+        )}
 
         <ToastContainer autoClose={1000} />
       </div>
+
       <Footer />
     </>
   );

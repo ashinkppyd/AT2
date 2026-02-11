@@ -1,63 +1,142 @@
-.cart-container {
-  width: 80%;
-  margin: auto;
+.cart-wrapper {
+  width: 90%;
+  max-width: 1100px;
+  margin: 40px auto;
+}
+
+.cart-title {
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+
+.cart-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .cart-item {
   display: flex;
   gap: 20px;
-  padding: 15px;
-  border: 1px solid #ddd;
-  border-radius: 12px;
+  padding: 18px;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.06);
   align-items: center;
-  background: #fafafa;
 }
 
 .cart-item img {
-  width: 120px;
-  height: auto;
-  border-radius: 10px;
+  width: 130px;
+  height: 130px;
+  object-fit: cover;
+  border-radius: 12px;
 }
 
 .cart-details {
   flex: 1;
 }
 
-.cart-price {
-  font-size: 20px;
-  font-weight: bold;
+.cart-details h3 {
+  margin: 0 0 6px;
+}
+
+.price {
+  font-size: 18px;
+  font-weight: 600;
   color: #2a7;
 }
 
 .qty-control {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin: 8px 0;
+  gap: 12px;
+  margin: 12px 0;
 }
 
 .qty-control button {
-  padding: 6px 10px;
-  background: #eee;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
   border: none;
-  border-radius: 6px;
+  background: #f0f0f0;
+  font-size: 18px;
   cursor: pointer;
-  font-size: 16px;
+}
+
+.qty-control button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .qty-control span {
   font-size: 16px;
-  font-weight: bold;
+  font-weight: 600;
 }
 
 .remove-btn {
   background: #ff4d4f;
-  color: white;
-  padding: 6px 12px;
+  color: #fff;
   border: none;
-  border-radius: 6px;
+  padding: 8px 14px;
+  border-radius: 8px;
   cursor: pointer;
 }
+
 .remove-btn:hover {
   background: #e60000;
+}
+
+.cart-summary {
+  margin-top: 30px;
+  padding: 20px;
+  border-radius: 14px;
+  background: #f9f9f9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cart-summary h3 {
+  font-size: 22px;
+}
+
+.btn {
+  padding: 12px 20px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.btn.primary {
+  background: #2a7;
+  color: #fff;
+}
+
+.btn.checkout {
+  background: #000;
+  color: #fff;
+}
+
+.cart-empty,
+.cart-loading {
+  text-align: center;
+  margin-top: 80px;
+}
+
+.cart-empty h2 {
+  margin-bottom: 20px;
+}
+
+
+@media (max-width: 768px) {
+  .cart-item {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .cart-summary {
+    flex-direction: column;
+    gap: 15px;
+  }
 }

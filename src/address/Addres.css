@@ -1,0 +1,195 @@
+.address-form {
+  background: #ffffff;
+  padding: 26px;
+  border-radius: 18px;
+  margin-bottom: 36px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+}
+
+.address-form h3 {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #111;
+}
+
+
+.address-form input {
+  width: 100%;
+  padding: 13px 15px;
+  margin-bottom: 14px;
+  border-radius: 12px;
+  border: 1px solid #d6d6d6;
+  font-size: 14px;
+  background: #fafafa;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.address-form input:focus {
+  outline: none;
+  border-color: #000;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+}
+
+
+.address-form label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 18px 0;
+  font-size: 14px;
+  color: #444;
+  cursor: pointer;
+}
+
+.address-form input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: #000;
+}
+
+.address-form button {
+  width: 100%;
+  padding: 14px;
+  border-radius: 14px;
+  background: #000;
+  color: #fff;
+  border: none;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.1s ease;
+}
+
+.address-form button:hover {
+  opacity: 0.88;
+}
+
+.address-form button:active {
+  transform: scale(0.97);
+}
+
+.address-form button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
+.address-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+
+.address-card {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 20px;
+  position: relative;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.07);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.address-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.12);
+}
+
+
+.address-card.default {
+  border: 2px solid #000;
+}
+
+
+.address-card p {
+  margin: 6px 0;
+  font-size: 14px;
+  color: #555;
+  line-height: 1.4;
+}
+
+.address-card strong {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111;
+}
+
+
+.badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: #000;
+  color: #fff;
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+
+.actions {
+  display: flex;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.actions button {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.1s ease;
+}
+
+
+.actions button:first-child {
+  background: #111;
+  color: #fff;
+}
+
+.actions button:first-child:hover {
+  opacity: 0.85;
+}
+
+
+.actions .danger {
+  background: #ff4d4f;
+  color: #fff;
+}
+
+.actions .danger:hover {
+  opacity: 0.85;
+}
+
+.actions button:active {
+  transform: scale(0.96);
+}
+
+.address-list + p,
+.address-form + p {
+  font-size: 15px;
+  color: #666;
+  margin-top: 10px;
+}
+
+
+@media (max-width: 768px) {
+  .address-form {
+    padding: 20px;
+  }
+
+  .address-list {
+    grid-template-columns: 1fr;
+  }
+
+  .address-card {
+    padding: 18px;
+  }
+}

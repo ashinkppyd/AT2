@@ -1,156 +1,204 @@
-import React, { useState } from 'react'
-import './LoginRegister.css';
-// import { FaUser, FaLock, FaEnvelope } from "react-icons/fa";
+import React, { useState } from "react"
+import "./LoginRegister.css"
+import { useContext } from "react"
+import { AuthContext } from "./AuthContext"
 
-import { FaUser } from "@react-icons/all-files/fa/FaUser";
-import { FaLock } from "@react-icons/all-files/fa/FaLock";
-import { FaEnvelope } from "@react-icons/all-files/fa/FaEnvelope";
-import axios from 'axios'
-import { useNavigate } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
+import { FaUser } from "@react-icons/all-files/fa/FaUser"
+import { FaLock } from "@react-icons/all-files/fa/FaLock"
+import { FaEnvelope } from "@react-icons/all-files/fa/FaEnvelope"
 
-let LoginRegister= ()=> {
-    const[state,setState]=useState("")
-    let [user,setUser]=useState({userName:"",email:"",password:""})
-    let [error,setError]=useState({})
+import axios from "axios"
+import { useNavigate } from "react-router-dom"
+import { ToastContainer, toast } from "react-toastify"
+import api from "../api/api"
 
-let RegisterLink =()=>{
-    setState('active')
-} 
+const LoginRegister = () => {
+  const [state, setState] = useState("")
+  const [user, setUser] = useState({
+    userName: "",
+    email: "",
+    password: "",
+  })
+  const [error, setError] = useState({})
+
+  const [userName, setUserName] = useState("")
+  const [password, setPassword] = useState("")
+  const { setUser:setUserContext } = useContext(AuthContext)
+
+  const nav = useNavigate()
+
  
-let loginLink=()=>{
-    setState('')
-}
-function handleRegister(e){
+  const handleRegister = async (e) => {
     e.preventDefault()
-    let error={}
-  if(user.userName.trim()==""){
-    error.userName="enter the name "
+    setError({})
+
+    try {
+      const res = await axios.post(
+        "http://localhost:8000/api/account/register/",
+        {
+          username: user.userName,
+          email: user.email,
+          password: user.password,
+        }
+      )
+
+      toast.success(res.data.message)
+      setUser({ userName: "", email: "", password: "" })
+      setState("")
+
+    } catch (err) {
+      if (err.response?.status === 400) {
+        const backendErrors = err.response.data
+
+        setError({
+          userName: backendErrors.username?.[0],
+          email: backendErrors.email?.[0],
+          password: backendErrors.password?.[0],
+        })
+      } else {
+        toast.error("Server error. Please try again.")
+      }
+    }
   }
-  if(user.email.trim()==""){
-    error.email="pls enter the email"
+
+  const handleLogin = async (e) => {
+    e.preventDefault()
+
+    try {
+      
+      const res = await api.post(
+        "account/login/",
+        {
+          username: userName,
+          password: password,
+        },
+        { withCredentials: true }
+      )
+
+      const {data:meRes} = await api.get("account/me/", {
+        withCredentials: true,
+      });
+
+      setUserContext(meRes);
+
+      toast.success("Login Success")
+
+      
+      if (meRes.role === 'admin') {
+          nav("/dashboard");
+        } else {
+          nav("/")
+        }
+
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Invalid credentials")
+    }
   }
-  if(user.password.trim()==""){
-    error.password="pls enter password"
-  }  
-   if(! /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(user.email)){
-   error.email="enter the right email"
-  }
-  setError(error)
-  if(Object.keys(error).length==0){
-    axios.post('http://127.0.0.1:8000/api/account/register/', {
-  username: user.userName,
-  email: user.email,
-  password: user.password
-})
-    setUser({userName:"",email:"",password:"",cart:[],orders:[],role:"user"})
-    setState('')
- 
-  }
-    return
-
-}
-let  [userName,setUserName]=useState('')
-let  [password,setPassword]=useState('')
-let nav=useNavigate()
-async function handelLogin(e) {
-  e.preventDefault()
-
-  try {
-   const res = await axios.post(
-  'http://127.0.0.1:8000/api/account/login/',
-  {
-    username: userName,
-    password: password
-  },
-  {
-    withCredentials: true
-  }
-)
-
-
-
-
-    // if (res.data.status === "block") {
-    //   toast.warning("You are blocked")
-    //   return
-    // }
-
-    toast.success(res.data.message)
-    console.log(res.data)
-
-  setTimeout(() => {
-  if (res.data.role === "admin") {
-    nav("/dashboard")
-  } else {
-    nav("/")
-  }
-}, 1200)
-
-  } catch (err) {
-    // console.log("Login error:", err.response?.data)
-    toast.error(err.response?.data?.error || "Login fd")
-  }
-}
-
-
+``
   return (
-    <div className='body'>
-    <div className={`wrapper ${state}`}>
-        <div className=' form-box login'>
-            <form id='one' onSubmit={handelLogin}>
-                <h1 style={{fontSize:"30px", fontWeight:"bold",color:"white"}}>Login</h1>
-                <div className='input-box'>
-                    <input type='text'
-                    placeholder='username' required onChange={(e)=>setUserName(e.target.value)}/>
-                    <FaUser className='icon' />
-                </div>
-                <div className='input-box'>
-                    <input type='password'
-                    placeholder='Password' required onChange={(e)=>setPassword(e.target.value)}/>
-                    <FaLock  className='icon'/>
-                </div>
-                <div className='remember-forget'>
-                    <label><input type='checkbox'/>Remember Me</label>
-                    <a href='#'>Forgot Password</a>
-                </div>
-                <button type='submit' >Login</button>
-                <div className='register-link'>
-                    <p>Don't have an account?<a href='#' onClick={RegisterLink}>Register</a></p>
-                </div>
-            </form>
+    <div className="body">
+      <div className={`wrapper ${state}`}>
+
+       
+        <div className="form-box login">
+          <form onSubmit={handleLogin} noValidate>
+            <h1>Login</h1>
+
+            <div className="input-box">
+              <input
+                type="text"
+                placeholder="Username"
+                onChange={(e) => setUserName(e.target.value)}
+              />
+              <FaUser className="icon" />
+            </div>
+
+            <div className="input-box">
+              <input
+                type="password"
+                placeholder="Password"
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <FaLock className="icon" />
+            </div>
+
+            <button className="btn-form" type="submit">
+              Login
+            </button>
+
+            <div className="register-link">
+              <p>
+                Don't have an account?{" "}
+                <a href="#" onClick={() => setState("active")}>
+                  Register
+                </a>
+              </p>
+            </div>
+          </form>
         </div>
 
-        <div className=' form-box register'>
-            <form className='one'>
-                <h1 style={{fontSize:"30px", fontWeight:"bold",color:"white"}}>Registration</h1>
-                <div className='input-box'>
-                    <input type='text'
-                    placeholder='username' required onChange={(e)=>{setUser({...user,userName:e.target.value})}} value={user.userName}/>
-                    <FaUser className='icon' /> 
-                    <p>{error && error.userName}</p>
-                </div>
-                <div className='input-box'>
-                    <input type='email'
-                    placeholder='Email' required onChange={(e)=>{setUser({...user,email:e.target.value})}} value={user.email}/>
-                    <FaEnvelope className='icon' /> 
-                    <p>{error && error.email}</p>
-                </div>
-                <div className='input-box'>
-                    <input type='password'
-                    placeholder='Password' required onChange={(e)=>{setUser({...user,password:e.target.value})}} value={user.password}/>
-                    <FaLock  className='icon'/>
-                    <p>{error && error.password}</p>
-                </div>
-                <button type='submit' onClick={handleRegister}>Register</button>
-                <div className='register-link'>
-                    <p>Already have an Account? <a href='#one'onClick={loginLink}>Login</a></p>
-                </div>
-            </form>
+       
+        <div className="form-box register">
+          <form onSubmit={handleRegister} noValidate>
+            <h1>Register</h1>
+
+            <div className="input-box">
+              <input
+                type="text"
+                placeholder="Username"
+                value={user.userName}
+                onChange={(e) =>
+                  setUser({ ...user, userName: e.target.value })
+                }
+              />
+              <FaUser className="icon" />
+              <p className="error">{error?.userName}</p>
+            </div>
+
+            <div className="input-box">
+              <input
+                type="email"
+                placeholder="Email"
+                value={user.email}
+                onChange={(e) =>
+                  setUser({ ...user, email: e.target.value })
+                }
+              />
+              <FaEnvelope className="icon" />
+              <p className="error">{error?.email}</p>
+            </div>
+
+            <div className="input-box">
+              <input
+                type="password"
+                placeholder="Password"
+                value={user.password}
+                onChange={(e) =>
+                  setUser({ ...user, password: e.target.value })
+                }
+              />
+              <FaLock className="icon" />
+              <p className="error">{error?.password}</p>
+            </div>
+
+            <button className="btn-form" type="submit">
+              Register
+            </button>
+
+            <div className="register-link">
+              <p>
+                Already have an account?{" "}
+                <a href="#" onClick={() => setState("")}>
+                  Login
+                </a>
+              </p>
+            </div>
+          </form>
         </div>
-    </div>
-    <ToastContainer autoClose={1000}/>
+
+      </div>
     </div>
   )
 }
+
 export default LoginRegister

@@ -7,8 +7,21 @@ import watch4 from '../assets/watch4.jpg'
 import {useNavigate} from 'react-router-dom'
 import Footer from "../components/Footer";
 import { useState } from "react";
+import axios from "axios";
+import api from "../api/api";
 export default function HomePage() {
   let nav=useNavigate()
+
+      function handleLogout() {
+    api.post(
+      "account/logout/",
+      {},
+      { withCredentials: true }
+    ).finally(() => {
+      nav("/login")
+    })
+    console.log("working")
+  }
 
   return (
     <div className="homepage">
@@ -57,9 +70,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-      
-
-    
      <Footer></Footer>
     </div>
   );

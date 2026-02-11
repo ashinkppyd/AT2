@@ -1,45 +1,28 @@
 import React, { useEffect, useState } from 'react'
 import './Navbar.css'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation, data } from 'react-router-dom'
 import axios from 'axios'
+import api from '../api/api'
 
 function NavBar() {
   const nav = useNavigate()
   const location = useLocation()
   const [isAuth, setIsAuth] = useState(false)
-
-  useEffect(() => {
-    axios.get(
-      'http://127.0.0.1:8000/api/account/profile/',
-      { withCredentials: true }
-    )
+useEffect(() => {
+  api.get("account/profile/")
     .then((res) => {
-      console.log("hello");
-      setIsAuth(true)
-        console.log(res.data)
+      setIsAuth(res.data.authenticated === true);
+    })
+    .catch(() => {
+      setIsAuth(false);
+    });
+}, [location.pathname]);
 
-    })
-    .catch((error) => {
-      console.log(error.message);
-      setIsAuth(false)
-    })
-  }, [location.pathname]) // 🔥 re-check on route change
-
-  function handleLogout() {
-    axios.post(
-      'http://127.0.0.1:8000/api/account/logout/',
-      {},
-      { withCredentials: true }
-    ).then(() => {
-      setIsAuth(false)
-      nav('/login')
-    })
-  }
 
   return (
     <div className='con'>
       <ul className='left'>
-        <li className='listItem logo'>AT2</li>
+        <li className='listItem logo' onClick={()=> nav('/')}>AT2</li>
       </ul>
 
       <ul className='right'>
@@ -54,12 +37,9 @@ function NavBar() {
               <span className='listItem' onClick={() => nav('/profile')}>
                 Profile
               </span>
-              <span className='listItem' onClick={handleLogout}>
-                Logout
-              </span>
             </>
           ) : (
-            <button onClick={() => nav('/login')}>Login</button>
+            <button className='nav-btn' onClick={() => nav('/login')}>Login</button>
           )}
         </li>
       </ul>

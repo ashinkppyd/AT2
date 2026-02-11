@@ -1,109 +1,174 @@
+.profile-page {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 20px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont;
+  color: #111;
+}
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-body {
-  font-family: "Poppins", sans-serif;
-  background: #f5f6fa;
-  color: #333;
-}
 .user {
-  background: #fff;
-  padding: 20px;
-  margin: 20px auto;
-  max-width: 800px;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 24px;
   display: flex;
-  justify-content: space-evenly;
+  justify-content: space-between;
   align-items: center;
+  gap: 30px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+  margin-bottom: 35px;
 }
-.user p {
-  font-size: 16px;
+
+.user h2 {
+  font-size: 24px;
   margin-bottom: 10px;
+}
+
+.user p {
+  margin: 6px 0;
+  font-size: 15px;
   color: #555;
 }
-.wishlist {
-  background: #fff;
-  padding: 20px;
-  margin: 20px auto;
-  max-width: 800px;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+
+.pfp {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #f0f0f0;
 }
-.wishlist h1 {
+
+.btn-out {
+  margin-top: 14px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: none;
+  background: #111;
+  color: #fff;
+  cursor: pointer;
+}
+
+.profile-card {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 24px;
+  margin-bottom: 35px;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.06);
+}
+
+.section-header {
+  border-bottom: 1px solid #eee;
+  padding-bottom: 12px;
+  margin-bottom: 18px;
+}
+
+.section-header h2 {
   font-size: 22px;
-  font-weight: 600;
-  color: #444;
 }
-.previous {
-  background: #fff;
-  padding: 20px;
-  margin: 20px auto;
-  max-width: 900px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+
+.address-wrapper {
+  display: grid;
+  gap: 16px;
 }
-.previous h1 {
-  font-size: 24px;
-  font-weight: 600;
-  margin-bottom: 20px;
-  color: #222;
+.address-wrapper > div {
+  border-radius: 14px;
 }
-.orders-container {
+
+.orders-list {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px;
 }
-.orders-container > div {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-.orders-container div > div {
+
+.order-card {
   background: #fafafa;
-  padding: 16px;
-  border-radius: 10px;
-  flex: 1 1 calc(50% - 20px);
-  min-width: 280px;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.05);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 16px;
+  padding: 20px;
 }
-.orders-container div > div:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
 }
-.orders-container img {
+
+.order-date {
+  font-size: 13px;
+  color: #777;
+}
+
+.order-total {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.order-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 18px;
+}
+
+
+.order-item {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+}
+
+.order-item img {
   width: 100%;
-  max-height: 180px;
+  height: 120px;
   object-fit: contain;
-  border-radius: 8px;
-  margin-bottom: 12px;
+  border-radius: 10px;
+  margin-bottom: 10px;
 }
-.orders-container p {
-  margin: 6px 0;
-  font-size: 14px;
-  color: #555;
+
+.item-info {
+  text-align: center;
 }
-.orders-container button {
-  margin-top: 10px;
-  padding: 10px 16px;
-  background: #4a90e2;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
+
+.item-name {
   font-size: 14px;
   font-weight: 500;
-  transition: background 0.3s ease;
 }
-.orders-container button:hover {
-  background: #357abd;
+
+.item-qty {
+  font-size: 13px;
+  color: #666;
 }
-.pfp{
-  border-radius: 100%;
-  width: 25%;
-  height: auto;
+
+.buy-again-btn {
+  margin-top: 10px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: none;
+  background: #000;
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.empty-text {
+  font-size: 15px;
+  color: #666;
+}
+
+@media (max-width: 768px) {
+  .user {
+    flex-direction: column-reverse;
+    text-align: center;
+  }
+
+  .pfp {
+    width: 110px;
+    height: 110px;
+  }
+
+  .profile-page {
+    padding: 0 15px;
+  }
 }

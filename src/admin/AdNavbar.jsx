@@ -1,27 +1,52 @@
-import React from 'react'
-import  styles from './AdNavbar.module.css'
-import { useNavigate, useLocation } from 'react-router-dom'
-
-
+import React from "react"
+import styles from "./AdNavbar.module.css"
+import { useNavigate, useLocation } from "react-router-dom"
+import { useContext } from "react"
+import { AuthContext } from "../Autho/AuthContext"
+import api from "../api/api"
 
 function AdNavbar() {
-const nava = useNavigate()
-const loc = useLocation()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const { setUser:setUserContext } = useContext(AuthContext);
 
- function handleLogout(){
-      nava('/login')
-      localStorage.setItem("isLoggedIn","false")
-      localStorage.clear()
-    }
+  function handleLogout() {
+    api.post("account/logout/").then(()=>{
+      setUserContext(null)
+    }).finally(() => navigate("/login"));
+  }
+
   return (
-    <div className={styles.main}> 
-    <h2 style={{textAlign:"center"}}>ADMIN PANEL</h2>
-    <div className={styles.sub}><br/>
-        <h5 className={loc.pathname === '/Dashboard'? styles.active : styles.items } onClick={()=>{nava('/Dashboard')}}>Dashboard</h5><hr/>
-        <h5  className={loc.pathname === '/UserManagement'? styles.active : styles.items } onClick={()=>{nava('/UserManagement')}}>User Management</h5><hr/>
-        <h5  className={loc.pathname === '/ProductManagement'? styles.active : styles.items } onClick={()=>{nava('/ProductManagement')}}>Product Management</h5><hr />
-    </div> <br/>
-    <button onClick={handleLogout}>LOGOUT</button>
+    <div className={styles.main}>
+      <h2>ADMIN PANEL</h2>
+
+      <div className={styles.sub}>
+        <h5
+          className={location.pathname === "/dashboard" ? styles.active : styles.items}
+          onClick={() => navigate("/dashboard")}
+        >
+          Dashboard
+        </h5>
+        <hr />
+
+        <h5
+          className={location.pathname === "/usermanagement" ? styles.active : styles.items}
+          onClick={() => navigate("/usermanagement")}
+        >
+          User Management
+        </h5>
+        <hr />
+
+        <h5
+          className={location.pathname === "/productmanagement" ? styles.active : styles.items}
+          onClick={() => navigate("/productmanagement")}
+        >
+          Product Management
+        </h5>
+        <hr />
+      </div>
+
+      <button onClick={handleLogout}>LOGOUT</button>
     </div>
   )
 }
