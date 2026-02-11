@@ -81,7 +81,7 @@ const LoginRegister = () => {
 
       setUserContext(meRes);
 
-      toast.success("Login Success")
+      toast.success("Login Successfully")
 
       
       if (meRes.role === 'admin') {

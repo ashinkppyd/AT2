@@ -39,7 +39,8 @@ function Layout({ children }) {
   const isAdminRoute =
     location.pathname.startsWith("/dashboard") ||
     location.pathname.startsWith("/usermanagement") ||
-    location.pathname.startsWith("/productmanagement");
+    location.pathname.startsWith("/productmanagement") ||
+    location.pathname.startsWith("/order");
 
   if (user?.role?.toLowerCase() === "admin" && isAdminRoute) {
     return (
@@ -68,7 +69,7 @@ function App() {
       <AuthProvider>
         <Layout>
           <Routes>
-            {/* AUTH */}
+            
             <Route
               path="/login"
               element={
@@ -78,12 +79,11 @@ function App() {
               }
             />
 
-            {/* PUBLIC */}
             <Route path="/" element={<Home />} />
             <Route path="/shop" element={<Shop />} />
             <Route path="/blog" element={<Blog />} />
 
-            {/* USER */}
+           
             <Route
               path="/cart"
               element={
@@ -102,7 +102,7 @@ function App() {
               }
             />
 
-            {/* ✅ ONLY THIS PART CHANGED */}
+            
             <Route
               path="/checkout"
               element={
@@ -123,7 +123,7 @@ function App() {
               }
             />
 
-            {/* ADMIN */}
+            
             <Route
               path="/dashboard"
               element={
