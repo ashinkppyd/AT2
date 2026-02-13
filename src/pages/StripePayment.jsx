@@ -1,73 +1,73 @@
-import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
-import { toast } from "react-toastify";
-import { useState } from "react";
-import api from "../api/api";
+// import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
+// import { toast } from "react-toastify";
+// import { useState } from "react";
+// import api from "../api/api";
 
-function StripePayment({ amount, onSuccess }) {
-  const stripe = useStripe();
-  const elements = useElements();
-  const [loading, setLoading] = useState(false);
+// function StripePayment({ amount, onSuccess }) {
+//   const stripe = useStripe();
+//   const elements = useElements();
+//   const [loading, setLoading] = useState(false);
 
-  const handlePayment = async () => {
-    if (!stripe || !elements) {
-      toast.error("Stripe is not loaded yet");
-      return;
-    }
+//   const handlePayment = async () => {
+//     if (!stripe || !elements) {
+//       toast.error("Stripe is not loaded yet");
+//       return;
+//     }
 
-    setLoading(true);
+//     setLoading(true);
 
-    try {
-      // 🔹 1. Create PaymentIntent (BACKEND)
-      const res = await api.post("payments/create-payment-intent/", {
-        amount: Math.round(amount * 100), // ₹ → paise
-      });
+//     try {
+      
+//       const res = await api.post("payments/create-payment-intent/", {
+//         amount: Math.round(amount * 100), // ₹ → paise
+//       });
 
-      const clientSecret = res.data.client_secret;
+//       const clientSecret = res.data.client_secret;
 
-      // 🔹 2. Confirm payment (STRIPE)
-      const result = await stripe.confirmCardPayment(clientSecret, {
-        payment_method: {
-          card: elements.getElement(CardElement),
-        },
-      });
+     
+//       const result = await stripe.confirmCardPayment(clientSecret, {
+//         payment_method: {
+//           card: elements.getElement(CardElement),
+//         },
+//       });
 
-      if (result.error) {
-        toast.error(result.error.message);
-      } else if (result.paymentIntent.status === "succeeded") {
-        toast.success("Payment successful 💳");
-        onSuccess(); // ✅ Place order
-      }
-    } catch (error) {
-      toast.error("Payment failed");
-    } finally {
-      setLoading(false);
-    }
-  };
+//       if (result.error) {
+//         toast.error(result.error.message);
+//       } else if (result.paymentIntent.status === "succeeded") {
+//         toast.success("Payment successful 💳");
+//         onSuccess(); 
+//       }
+//     } catch (error) {
+//       toast.error("Payment failed");
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
 
-  return (
-    <div className="stripe-box">
-      <CardElement
-        options={{
-          style: {
-            base: {
-              fontSize: "16px",
-              color: "#32325d",
-              "::placeholder": { color: "#a0aec0" },
-            },
-          },
-        }}
-      />
+//   return (
+//     <div className="stripe-box">
+//       <CardElement
+//         options={{
+//           style: {
+//             base: {
+//               fontSize: "16px",
+//               color: "#32325d",
+//               "::placeholder": { color: "#a0aec0" },
+//             },
+//           },
+//         }}
+//       />
 
-      <button
-        className="place-order-btn"
-        style={{ marginTop: "15px" }}
-        onClick={handlePayment}
-        disabled={loading}
-      >
-        {loading ? "Processing..." : `Pay ₹${amount}`}
-      </button>
-    </div>
-  );
-}
+//       <button
+//         className="place-order-btn"
+//         style={{ marginTop: "15px" }}
+//         onClick={handlePayment}
+//         disabled={loading}
+//       >
+//         {loading ? "Processing..." : `Pay ₹${amount}`}
+//       </button>
+//     </div>
+//   );
+// }
 
-export default StripePayment;
+// export default StripePayment;

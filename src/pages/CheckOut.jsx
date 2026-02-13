@@ -2,17 +2,23 @@ import React, { useEffect, useState } from "react";
 import "./CheckOut.css";
 import { ToastContainer, toast } from "react-toastify";
 import api from "../api/api";
-import StripePayment from "./StripePayment"; 
-import axios from "axios";
 
+function loadRazorpay() {
+  return new Promise((resolve) => {
+    if (window.Razorpay) return resolve(true);
+
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+}
 
 function Checkout() {
   const [cartItems, setCartItems] = useState([]);
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
-  const [payment, setPayment] = useState("cod");
-  const [orderPlaced, setOrderPlaced] = useState(false);
-
 
   useEffect(() => {
     api
@@ -21,7 +27,6 @@ function Checkout() {
       .catch(() => toast.error("Please login first"));
   }, []);
 
-  
   useEffect(() => {
     api
       .get("addresses/")
@@ -29,44 +34,50 @@ function Checkout() {
         const addrList = res.data.results || [];
         setAddresses(addrList);
 
-        const defaultAddr = addrList.find(a => a.is_default);
+        const defaultAddr = addrList.find((a) => a.is_default);
         if (defaultAddr) setSelectedAddress(defaultAddr.id);
       })
       .catch(() => toast.error("Failed to load addresses"));
   }, []);
 
- 
   const totalPrice = cartItems.reduce(
     (sum, item) => sum + item.product.price * item.qauntity,
     0
   );
 
- 
-  const placeOrder = () => {
-    if (!selectedAddress) {
-      toast.error("Please select a delivery address");
-      return;
+  async function payments() {
+    try {
+      const loaded = await loadRazorpay();
+      if (!loaded) {
+        toast.error("Razorpay SDK failed to load");
+        return;
+      }
+
+      const res = await api.post("payments/create-order/");
+      const { order_id, key, amount } = res.data;
+
+      const options = {
+        key,
+        amount,
+        currency: "INR",
+        name: "PartPoint",
+        description: "Order Payment",
+        order_id,
+        handler: async function (response) {
+          try {
+            await api.post("payments/verify-payment/", response);
+            toast.success("Payment successful 🎉");
+          } catch {
+            toast.error("Payment verification failed");
+          }
+        },
+        theme: { color: "#3399cc" },
+      };
+
+      new window.Razorpay(options).open();
+    } catch {
+      toast.error("Payment failed");
     }
-
-    api
-      .post("order/create/", {
-        address_id: selectedAddress,
-        payment: payment,
-      })
-      .then(() => {
-        toast.success("Order placed successfully 🎉");
-        setOrderPlaced(true);
-      })
-      .catch(() => toast.error("Checkout failed"));
-  };
-
-  if (orderPlaced) {
-    return (
-      <div className="checkout-conv">
-        <h2>Order Placed Successfully 🎉</h2>
-        <p>Your order will be delivered soon 📦</p>
-      </div>
-    );
   }
 
   return (
@@ -80,7 +91,7 @@ function Checkout() {
         {addresses.length === 0 ? (
           <p>No saved addresses. Please add one in profile.</p>
         ) : (
-          addresses.map(addr => (
+          addresses.map((addr) => (
             <label key={addr.id} className="address-box">
               <input
                 type="radio"
@@ -88,7 +99,6 @@ function Checkout() {
                 checked={selectedAddress === addr.id}
                 onChange={() => setSelectedAddress(addr.id)}
               />
-
               <div>
                 <strong>{addr.full_name}</strong>
                 <p>{addr.address_line_1}</p>
@@ -104,48 +114,45 @@ function Checkout() {
         )}
       </div>
 
-     
+      
       <div className="order-summary">
         <h3>Order Summary</h3>
 
-        {cartItems.map(item => (
+        {cartItems.map((item) => (
           <div key={item.id} className="summary-item">
-            <span>
-              {item.product.name} × {item.qauntity}
-            </span>
-            <span>
+            <div className="summary-left">
+              <img
+                src={item.product.image}
+                alt={item.product.name}
+                className="summary-img"
+              />
+
+              <div className="summary-info">
+                <p className="summary-name">{item.product.name}</p>
+                <p className="summary-qty">Qty: {item.qauntity}</p>
+              </div>
+            </div>
+
+            <span className="summary-price">
               ₹{item.product.price * item.qauntity}
             </span>
           </div>
         ))}
 
         <hr />
-        <h3>Total: ₹{totalPrice}</h3>
-      </div>
 
-    
-      <div className="payment-section">
-        <h3>Payment Method</h3>
+        <div className="summary-total">
+          <span>Total</span>
+          <span>₹{totalPrice}</span>
+        </div>
 
-        <select
-          value={payment}
-          onChange={(e) => setPayment(e.target.value)}
+        <button
+          className="pay-btn"
+          onClick={payments}
+          disabled={!selectedAddress}
         >
-          <option value="cod">Cash on Delivery</option>
-          <option value="card">Card (Stripe)</option>
-          <option value="upi">UPI</option>
-        </select>
-
-        {payment === "card" ? (
-          <StripePayment
-            amount={totalPrice}
-            onSuccess={placeOrder}
-          />
-        ) : (
-          <button className="place-order-btn" onClick={placeOrder}>
-            Place Order
-          </button>
-        )}
+          Pay 
+        </button>
       </div>
 
       <ToastContainer />

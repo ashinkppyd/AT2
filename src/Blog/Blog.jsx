@@ -1,38 +1,32 @@
-
 import React, { useEffect, useState } from 'react'
-import axios from 'axios'
 import './Blog.css'
 import Footer from '../components/Footer'
+
 function Blog() {
   const [banner, setBanner] = useState(null)
   const [posts, setPosts] = useState([])
 
-
   useEffect(() => {
-    axios.get('http://localhost:3000/banner')
-      .then(res => setBanner(res.data[0]))
-      .catch(() => console.log('Error fetching banner'))
+    setBanner({
+      image: "https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3"
+    })
 
-    axios.get('http://localhost:3000/AllProducts')
-      .then(res => {
-        const mapped = res.data.slice(0, 6).map(p => ({
-          id: p.id,
-          title: `The Craft of ${p.name}`,
-          excerpt: `Step inside the artistry behind the ${p.name} — a precision timepiece priced at ₹${p.price}.`,
-          image: p.image,
-          date: new Date().toDateString(),
-          author: "Aurum Editorial"
-        }))
-        setPosts(mapped)
-      })
-      .catch(() => console.log('Error fetching posts'))
+    setPosts([
+      {
+        id: 1,
+        title: "The Art of Timeless Precision",
+        excerpt: "Luxury watches are not accessories — they are statements of discipline, legacy, and refined taste.",
+        image: "https://images.unsplash.com/photo-1508057198894-247b23fe5ade",
+        date: "January 20, 2025",
+        author: "Aurum Editorial"
+      }
+    ])
   }, [])
 
-  if (!banner) return <div>Loading...</div>
+  if (!banner) return null
 
   return (
     <div className="blog-page">
-    
       <section className="blog-hero">
         <img src={banner.image} alt="banner" />
         <div className="blog-hero-text">
@@ -41,23 +35,23 @@ function Blog() {
         </div>
       </section>
 
-    
       <section className="blog-list">
         {posts.map((post, i) => (
           <article key={post.id} className={`blog-post ${i % 2 === 0 ? 'left' : 'right'}`}>
             <div className="blog-image">
-              <img src={post.image} />
+              <img src={post.image} alt={post.title} />
             </div>
             <div className="blog-info">
               <h2>{post.title}</h2>
               <p className="blog-meta">{post.date} | by Ashin KP</p>
               <p>{post.excerpt}</p>
-              <a href="https://www.rolex.com/about-rolex" target='_self'>Read More →</a>
+              <a href="#">Read More →</a>
             </div>
           </article>
         ))}
       </section>
-      <Footer/>
+
+      <Footer />
     </div>
   )
 }
