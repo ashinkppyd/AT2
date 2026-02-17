@@ -34,7 +34,7 @@ const LoginRegister = () => {
 
     try {
       const res = await axios.post(
-        "http://localhost:8000/api/account/register/",
+        "http://3.6.89.120/api/account/register/",
         {
           username: user.userName,
           email: user.email,

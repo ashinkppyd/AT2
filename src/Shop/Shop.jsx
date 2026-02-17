@@ -23,7 +23,7 @@ function Shop() {
   const fetchProducts = async (pageNumber = 1) => {
     try {
       const res = await axios.get(
-        `http://localhost:8000/api/products/watches/?page=${pageNumber}`
+        `http://3.6.89.120/api/products/watches/?page=${pageNumber}`
       );
 
       const results = res.data.results || [];

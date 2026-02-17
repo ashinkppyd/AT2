@@ -14,13 +14,13 @@ function Details() {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8000/api/products/watches/${currentId}/`)
+      .get(`http://3.6.89.120/api/products/watches/${currentId}/`)
       .then((res) => setProduct(res.data))
       .catch(() => toast.error("Product not found"));
 
     axios
-      .get("http://localhost:8000/api/products/watches/")
-      .then((res) => setAllProducts(res.data.results || [])) // ✅ FIXED
+      .get("http://3.6.89.120/api/products/watches/")
+      .then((res) => setAllProducts(res.data.results || [])) 
       .catch(() => toast.error("Failed to load products"));
   }, [currentId]);
 
