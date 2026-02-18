@@ -46,14 +46,24 @@ function Checkout() {
   );
 
   async function payments() {
+    // FIX 1: Prevent Razorpay from crashing if the cart is empty
+    if (cartItems.length === 0 || totalPrice === 0) {
+      toast.error("Your cart is empty! Add items to pay.");
+      return;
+    }
+
     try {
       const loaded = await loadRazorpay();
       if (!loaded) {
-        toast.error("Razorpay SDK failed to load");
+        toast.error("Payment gateway blocked. Please disable your Adblocker.");
         return;
       }
 
-      const res = await api.post("payments/create-order/");
+      // FIX 2: Send the selected address to the backend so the order is linked to it
+      const res = await api.post("payments/create-order/", {
+        address_id: selectedAddress,
+      });
+      
       const { order_id, key, amount } = res.data;
 
       const options = {
@@ -65,18 +75,33 @@ function Checkout() {
         order_id,
         handler: async function (response) {
           try {
-            await api.post("payments/verify-payment/", response);
+            await api.post("payments/verify-payment/", {
+              ...response,
+              address_id: selectedAddress, // Pass address here too just in case
+            });
             toast.success("Payment successful 🎉");
-          } catch {
-            toast.error("Payment verification failed");
+          } catch (err) {
+            console.error("Verification Error:", err);
+            toast.error("Payment verification failed. Contact support.");
           }
         },
         theme: { color: "#3399cc" },
       };
 
-      new window.Razorpay(options).open();
-    } catch {
-      toast.error("Payment failed");
+      const rzp = new window.Razorpay(options);
+      
+      // FIX 3: Catch if the user closes the Razorpay window or their card fails
+      rzp.on('payment.failed', function (response){
+        toast.error(response.error.description || "Payment failed");
+      });
+
+      rzp.open();
+    } catch (error) {
+      console.error("Order Creation Error:", error);
+      
+      // FIX 4: Show the ACTUAL backend error message instead of hiding it!
+      const backendError = error.response?.data?.message || error.response?.data?.error || "Server failed to create order";
+      toast.error(backendError);
     }
   }
 
@@ -84,7 +109,6 @@ function Checkout() {
     <div className="checkout-container">
       <h2>Checkout</h2>
 
-     
       <div className="address-section">
         <h3>Delivery Address</h3>
 
@@ -114,7 +138,6 @@ function Checkout() {
         )}
       </div>
 
-      
       <div className="order-summary">
         <h3>Order Summary</h3>
 
@@ -149,7 +172,7 @@ function Checkout() {
         <button
           className="pay-btn"
           onClick={payments}
-          disabled={!selectedAddress}
+          disabled={!selectedAddress || cartItems.length === 0}
         >
           Pay 
         </button>
