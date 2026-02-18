@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
+// import axios from "axios";  <-- You don't need this anymore
 import "./Details.css";
 import { ToastContainer, toast } from "react-toastify";
-import api from "../api/api";
+import api from "../api/api"; // This handles your secure URL automatically
 
 function Details() {
   const { id } = useParams();
@@ -13,18 +13,19 @@ function Details() {
   const [allProducts, setAllProducts] = useState([]);
 
   useEffect(() => {
-    axios
-      .get(`http://3.6.89.120/api/products/watches/${currentId}/`)
+    // CHANGE 1: Use api.get and remove the domain part
+    api
+      .get(`products/watches/${currentId}/`)
       .then((res) => setProduct(res.data))
       .catch(() => toast.error("Product not found"));
 
-    axios
-      .get("http://3.6.89.120/api/products/watches/")
-      .then((res) => setAllProducts(res.data.results || [])) 
+    // CHANGE 2: Use api.get for the related products list as well
+    api
+      .get("products/watches/")
+      .then((res) => setAllProducts(res.data.results || []))
       .catch(() => toast.error("Failed to load products"));
   }, [currentId]);
 
-  
   function handleCart(productId) {
     api
       .post("cart/add/", { product: productId })
@@ -38,7 +39,6 @@ function Details() {
 
   if (!product) return <p>Loading...</p>;
 
-  
   const related = Array.isArray(allProducts)
     ? allProducts.filter(
         (p) => p.category === product.category && p.id !== product.id

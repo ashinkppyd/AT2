@@ -22,7 +22,7 @@ function Shop() {
 
   const fetchProducts = async (pageNumber = 1) => {
     try {
-      const res = await axios.get(
+      const res = await api.get(
         `products/watches/?page=${pageNumber}`
       );
 

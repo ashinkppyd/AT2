@@ -7,10 +7,10 @@ import { FaUser } from "@react-icons/all-files/fa/FaUser"
 import { FaLock } from "@react-icons/all-files/fa/FaLock"
 import { FaEnvelope } from "@react-icons/all-files/fa/FaEnvelope"
 
-import axios from "axios"
+// import axios from "axios"  <-- Removed this, you don't need it anymore
 import { useNavigate } from "react-router-dom"
 import { ToastContainer, toast } from "react-toastify"
-import api from "../api/api"
+import api from "../api/api" // This handles your secure URL
 
 const LoginRegister = () => {
   const [state, setState] = useState("")
@@ -27,14 +27,16 @@ const LoginRegister = () => {
 
   const nav = useNavigate()
 
- 
+  
   const handleRegister = async (e) => {
     e.preventDefault()
     setError({})
 
     try {
-      const res = await axios.post(
-        "http://3.6.89.120/api/account/register/",
+      // FIX: Changed from axios.post(...) to api.post(...)
+      // FIX: Removed the hardcoded http://3.6.89.120 URL
+      const res = await api.post(
+        "account/register/",
         {
           username: user.userName,
           email: user.email,
@@ -94,7 +96,7 @@ const LoginRegister = () => {
       toast.error(err.response?.data?.message || "Invalid credentials")
     }
   }
-``
+
   return (
     <div className="body">
       <div className={`wrapper ${state}`}>
