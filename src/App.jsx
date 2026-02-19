@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import {BrowserRouter,Routes,Route,useLocation,Navigate,} from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 
 import LoginRegister from "./Autho/LoginRegister";
 import Home from "./pages/Home";
@@ -11,6 +11,9 @@ import Blog from "./Blog/Blog";
 import Checkout from "./pages/CheckOut";
 import Profile from "./pages/Profile";
 
+// 🚀 NEW: Import your OrderSuccess page here
+import OrderSuccess from "./pages/OrderSuccess"; 
+
 import Dashboard from "./admin/Dashboard";
 import UserManagement from "./admin/UserManagement";
 import ProductManagement from "./admin/ProductManagement";
@@ -20,7 +23,6 @@ import OrderItems from "./admin/allorder";
 import ProtectedRoute from "./Autho/ProtectRoute";
 import PublicRoute from "./Autho/PublicRoute";
 import { AuthProvider, AuthContext } from "./Autho/AuthContext";
-
 
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
@@ -83,7 +85,6 @@ function App() {
             <Route path="/shop" element={<Shop />} />
             <Route path="/blog" element={<Blog />} />
 
-           
             <Route
               path="/cart"
               element={
@@ -102,7 +103,6 @@ function App() {
               }
             />
 
-            
             <Route
               path="/checkout"
               element={
@@ -114,6 +114,16 @@ function App() {
               }
             />
 
+            {/* 🚀 NEW: Added the Order Success Route */}
+            <Route
+              path="/payment-success"
+              element={
+                <ProtectedRoute>
+                  <OrderSuccess />
+                </ProtectedRoute>
+              }
+            />
+
             <Route
               path="/profile"
               element={
@@ -122,7 +132,6 @@ function App() {
                 </ProtectedRoute>
               }
             />
-
             
             <Route
               path="/dashboard"

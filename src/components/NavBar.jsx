@@ -22,7 +22,7 @@ useEffect(() => {
   return (
     <div className='con'>
       <ul className='left'>
-        <li className='listItem logo' onClick={()=> nav('/')}>AT2</li>
+        <li className='listItem logo' onClick={()=> nav('/')}>HeyTux</li>
       </ul>
 
       <ul className='right'>

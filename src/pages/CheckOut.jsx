@@ -1,17 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom"; // 🚀 ADDED THIS BACK
 import "./CheckOut.css";
 import { ToastContainer, toast } from "react-toastify";
 import api from "../api/api";
 
 function loadRazorpay() {
   return new Promise((resolve) => {
-    if (window.Razorpay) return resolve(true);
+    try {
+      if (window.Razorpay) return resolve(true);
 
-    const script = document.createElement("script");
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
-    script.onload = () => resolve(true);
-    script.onerror = () => resolve(false);
-    document.body.appendChild(script);
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    } catch (err) {
+      console.error("Razorpay load error:", err);
+      resolve(false);
+    }
   });
 }
 
@@ -19,91 +25,175 @@ function Checkout() {
   const [cartItems, setCartItems] = useState([]);
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    api
-      .get("cart/")
-      .then((res) => setCartItems(res.data))
-      .catch(() => toast.error("Please login first"));
+  const navigate = useNavigate(); // 🚀 INITIALIZED ROUTER
+
+  // ✅ SAFE HELPERS
+  const getQty = (item) => {
+    const qty = item?.quantity ?? item?.qauntity ?? 1;
+    return isNaN(qty) ? 1 : Number(qty);
+  };
+
+  const getPrice = (item) => {
+    const price = item?.product?.price ?? 0;
+    return isNaN(price) ? 0 : Number(price);
+  };
+
+  // ✅ FETCH CART (SAFE)
+  const fetchCart = useCallback(async () => {
+    try {
+      const res = await api.get("cart/");
+      setCartItems(Array.isArray(res?.data) ? res.data : []);
+    } catch (error) {
+      console.error("Cart fetch error:", error);
+      toast.error(
+        error?.response?.data?.message || "Please login first"
+      );
+    }
+  }, []);
+
+  // ✅ FETCH ADDRESSES (SAFE)
+  const fetchAddresses = useCallback(async () => {
+    try {
+      const res = await api.get("addresses/");
+      const addrList = res?.data?.results || [];
+
+      setAddresses(addrList);
+
+      const defaultAddr = addrList.find((a) => a?.is_default);
+      if (defaultAddr) {
+        setSelectedAddress(defaultAddr.id);
+      }
+    } catch (error) {
+      console.error("Address fetch error:", error);
+      toast.error(
+        error?.response?.data?.message ||
+          "Failed to load addresses"
+      );
+    }
   }, []);
 
   useEffect(() => {
-    api
-      .get("addresses/")
-      .then((res) => {
-        const addrList = res.data.results || [];
-        setAddresses(addrList);
+    fetchCart();
+    fetchAddresses();
+  }, [fetchCart, fetchAddresses]);
 
-        const defaultAddr = addrList.find((a) => a.is_default);
-        if (defaultAddr) setSelectedAddress(defaultAddr.id);
-      })
-      .catch(() => toast.error("Failed to load addresses"));
-  }, []);
+  // ✅ SAFE TOTAL
+  const totalPrice = cartItems.reduce((sum, item) => {
+    return sum + getPrice(item) * getQty(item);
+  }, 0);
 
-  const totalPrice = cartItems.reduce(
-    (sum, item) => sum + item.product.price * item.qauntity,
-    0
-  );
+  // ✅ PAYMENT FUNCTION (FULL SAFE)
+  const payments = async () => {
+    if (loading) return;
 
-  async function payments() {
-    // FIX 1: Prevent Razorpay from crashing if the cart is empty
-    if (cartItems.length === 0 || totalPrice === 0) {
+    if (!selectedAddress) {
+      toast.error("Please select delivery address");
+      return;
+    }
+
+    if (!cartItems.length || totalPrice <= 0) {
       toast.error("Your cart is empty! Add items to pay.");
       return;
     }
 
+    setLoading(true);
+
     try {
       const loaded = await loadRazorpay();
+
       if (!loaded) {
-        toast.error("Payment gateway blocked. Please disable your Adblocker.");
+        toast.error(
+          "Payment gateway blocked. Please disable AdBlock."
+        );
+        setLoading(false);
         return;
       }
 
-      // FIX 2: Send the selected address to the backend so the order is linked to it
-      const res = await api.post("payments/create-order/", {
-        address_id: selectedAddress,
-      });
-      
-      const { order_id, key, amount } = res.data;
+      // ✅ CREATE ORDER
+      let orderResponse;
+      try {
+        orderResponse = await api.post("payments/create-order/", {
+          address_id: selectedAddress,
+        });
+      } catch (err) {
+        console.error("Create order error:", err);
+        toast.error(
+          err?.response?.data?.message ||
+            "Server failed to create order"
+        );
+        setLoading(false);
+        return;
+      }
+
+      const { order_id, key, amount } = orderResponse?.data || {};
+
+      if (!order_id || !key || !amount) {
+        toast.error("Invalid payment configuration");
+        setLoading(false);
+        return;
+      }
 
       const options = {
         key,
         amount,
         currency: "INR",
-        name: "PartPoint",
+        name: "HeyTux",
         description: "Order Payment",
         order_id,
-        handler: async function (response) {
+
+        handler: async (response) => {
           try {
             await api.post("payments/verify-payment/", {
               ...response,
-              address_id: selectedAddress, // Pass address here too just in case
+              address_id: selectedAddress,
             });
+
             toast.success("Payment successful 🎉");
+            setCartItems([]);
+
+            // 🚀 THE PROPER REACT REDIRECT
+            setTimeout(() => {
+              navigate("/payment-success", { replace: true });
+            }, 1500);
+
           } catch (err) {
             console.error("Verification Error:", err);
-            toast.error("Payment verification failed. Contact support.");
+            toast.error(
+              err?.response?.data?.message ||
+                "Payment verification failed"
+            );
+          } finally {
+            setLoading(false);
           }
         },
+
+        modal: {
+          ondismiss: () => {
+            setLoading(false);
+          },
+        },
+
         theme: { color: "#3399cc" },
       };
 
       const rzp = new window.Razorpay(options);
-      
-      // FIX 3: Catch if the user closes the Razorpay window or their card fails
-      rzp.on('payment.failed', function (response){
-        toast.error(response.error.description || "Payment failed");
+
+      rzp.on("payment.failed", function (response) {
+        toast.error(
+          response?.error?.description || "Payment failed"
+        );
+        setLoading(false);
       });
 
       rzp.open();
     } catch (error) {
-      console.error("Order Creation Error:", error);
-      
-      // FIX 4: Show the ACTUAL backend error message instead of hiding it!
-      const backendError = error.response?.data?.message || error.response?.data?.error || "Server failed to create order";
-      toast.error(backendError);
+      console.error("Payment error:", error);
+      toast.error("Something went wrong during payment");
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="checkout-container">
@@ -124,14 +214,19 @@ function Checkout() {
                 onChange={() => setSelectedAddress(addr.id)}
               />
               <div>
-                <strong>{addr.full_name}</strong>
-                <p>{addr.address_line_1}</p>
-                {addr.address_line_2 && <p>{addr.address_line_2}</p>}
+                <strong>{addr?.full_name}</strong>
+                <p>{addr?.address_line_1}</p>
+                {addr?.address_line_2 && (
+                  <p>{addr.address_line_2}</p>
+                )}
                 <p>
-                  {addr.city}, {addr.state} - {addr.postal_code}
+                  {addr?.city}, {addr?.state} -{" "}
+                  {addr?.postal_code}
                 </p>
-                <p>📞 {addr.phone}</p>
-                {addr.is_default && <span className="badge">Default</span>}
+                <p>📞 {addr?.phone}</p>
+                {addr?.is_default && (
+                  <span className="badge">Default</span>
+                )}
               </div>
             </label>
           ))
@@ -145,19 +240,21 @@ function Checkout() {
           <div key={item.id} className="summary-item">
             <div className="summary-left">
               <img
-                src={item.product.image}
-                alt={item.product.name}
+                src={item?.product?.image}
+                alt={item?.product?.name}
                 className="summary-img"
               />
-
               <div className="summary-info">
-                <p className="summary-name">{item.product.name}</p>
-                <p className="summary-qty">Qty: {item.qauntity}</p>
+                <p className="summary-name">
+                  {item?.product?.name}
+                </p>
+                <p className="summary-qty">
+                  Qty: {getQty(item)}
+                </p>
               </div>
             </div>
-
             <span className="summary-price">
-              ₹{item.product.price * item.qauntity}
+              ₹{getPrice(item) * getQty(item)}
             </span>
           </div>
         ))}
@@ -172,9 +269,13 @@ function Checkout() {
         <button
           className="pay-btn"
           onClick={payments}
-          disabled={!selectedAddress || cartItems.length === 0}
+          disabled={
+            loading ||
+            !selectedAddress ||
+            cartItems.length === 0
+          }
         >
-          Pay 
+          {loading ? "Processing..." : "Pay"}
         </button>
       </div>
 
