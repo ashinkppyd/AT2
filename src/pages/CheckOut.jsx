@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom"; // 🚀 ADDED THIS BACK
+import { useNavigate } from "react-router-dom"; 
 import "./CheckOut.css";
 import { ToastContainer, toast } from "react-toastify";
 import api from "../api/api";
@@ -27,9 +27,8 @@ function Checkout() {
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const navigate = useNavigate(); // 🚀 INITIALIZED ROUTER
+  const navigate = useNavigate(); 
 
-  // ✅ SAFE HELPERS
   const getQty = (item) => {
     const qty = item?.quantity ?? item?.qauntity ?? 1;
     return isNaN(qty) ? 1 : Number(qty);
@@ -40,7 +39,6 @@ function Checkout() {
     return isNaN(price) ? 0 : Number(price);
   };
 
-  // ✅ FETCH CART (SAFE)
   const fetchCart = useCallback(async () => {
     try {
       const res = await api.get("cart/");
@@ -53,7 +51,7 @@ function Checkout() {
     }
   }, []);
 
-  // ✅ FETCH ADDRESSES (SAFE)
+
   const fetchAddresses = useCallback(async () => {
     try {
       const res = await api.get("addresses/");
@@ -79,12 +77,11 @@ function Checkout() {
     fetchAddresses();
   }, [fetchCart, fetchAddresses]);
 
-  // ✅ SAFE TOTAL
+ 
   const totalPrice = cartItems.reduce((sum, item) => {
     return sum + getPrice(item) * getQty(item);
   }, 0);
 
-  // ✅ PAYMENT FUNCTION (FULL SAFE)
   const payments = async () => {
     if (loading) return;
 
@@ -111,7 +108,6 @@ function Checkout() {
         return;
       }
 
-      // ✅ CREATE ORDER
       let orderResponse;
       try {
         orderResponse = await api.post("payments/create-order/", {
@@ -153,7 +149,7 @@ function Checkout() {
             toast.success("Payment successful 🎉");
             setCartItems([]);
 
-            // 🚀 THE PROPER REACT REDIRECT
+            
             setTimeout(() => {
               navigate("/payment-success", { replace: true });
             }, 1500);
@@ -203,7 +199,10 @@ function Checkout() {
         <h3>Delivery Address</h3>
 
         {addresses.length === 0 ? (
-          <p>No saved addresses. Please add one in profile.</p>
+          <>
+           <p>No saved addresses. Please add one in profile.</p>
+           <button className='pay-btn' onClick={() => nav('/profile')}>ADD</button>
+          </>
         ) : (
           addresses.map((addr) => (
             <label key={addr.id} className="address-box">

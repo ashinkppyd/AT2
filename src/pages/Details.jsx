@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-// import axios from "axios";  <-- You don't need this anymore
 import "./Details.css";
 import { ToastContainer, toast } from "react-toastify";
-import api from "../api/api"; // This handles your secure URL automatically
+import api from "../api/api"; 
 
 function Details() {
   const { id } = useParams();
@@ -13,13 +12,12 @@ function Details() {
   const [allProducts, setAllProducts] = useState([]);
 
   useEffect(() => {
-    // CHANGE 1: Use api.get and remove the domain part
     api
       .get(`products/watches/${currentId}/`)
       .then((res) => setProduct(res.data))
       .catch(() => toast.error("Product not found"));
 
-    // CHANGE 2: Use api.get for the related products list as well
+    
     api
       .get("products/watches/")
       .then((res) => setAllProducts(res.data.results || []))

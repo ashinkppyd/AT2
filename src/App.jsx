@@ -10,8 +10,6 @@ import Details from "./pages/Details";
 import Blog from "./Blog/Blog";
 import Checkout from "./pages/CheckOut";
 import Profile from "./pages/Profile";
-
-// 🚀 NEW: Import your OrderSuccess page here
 import OrderSuccess from "./pages/OrderSuccess"; 
 
 import Dashboard from "./admin/Dashboard";
@@ -114,7 +112,6 @@ function App() {
               }
             />
 
-            {/* 🚀 NEW: Added the Order Success Route */}
             <Route
               path="/payment-success"
               element={
