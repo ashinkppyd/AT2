@@ -201,7 +201,7 @@ function Checkout() {
         {addresses.length === 0 ? (
           <>
            <p>No saved addresses. Please add one in profile.</p>
-           <button className="style-add-adress" onClick={() => nav('/profile')}>ADD</button>
+           <button className="style-add-adress" onClick={() => navigate('/profile')}>ADD</button>
           </>
         ) : (
           addresses.map((addr) => (
